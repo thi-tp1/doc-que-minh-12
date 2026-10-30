@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Đọc Quê Mình 12</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f6b5c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Đọc Quê Mình">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+
+<!-- BẢN NHÁP do trợ lý soạn; thầy đã duyệt 30/10/2026 → phiên bản 1.0 -->
+<style>
+:root{--bg:#f6f4ee;--card:#fff;--ink:#1d2a2a;--mute:#5d6b6b;--line:#dcd8cc;--pri:#0f6b5c;--pri2:#e3f1ec;--warn:#9a5b00;--warn2:#fff3dc;--bad:#a3262a;--bad2:#fde8e8;--ok:#1d7a3a;--ok2:#e4f5e8;--hl:#fff1a8;--fs:17px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#141a19;--card:#1d2524;--ink:#e8eeec;--mute:#a3b1ae;--line:#34403e;--pri:#5cc3ad;--pri2:#1f3a34;--warn:#f0b75a;--warn2:#3a2f1a;--bad:#ff8a8a;--bad2:#3d2222;--ok:#7bd88f;--ok2:#1e3524;--hl:#5c5220}}
+:root[data-theme="dark"]{--bg:#141a19;--card:#1d2524;--ink:#e8eeec;--mute:#a3b1ae;--line:#34403e;--pri:#5cc3ad;--pri2:#1f3a34;--warn:#f0b75a;--warn2:#3a2f1a;--bad:#ff8a8a;--bad2:#3d2222;--ok:#7bd88f;--ok2:#1e3524;--hl:#5c5220}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:var(--fs)/1.6 "Segoe UI",Arial,sans-serif}
+header{background:var(--pri);color:#fff;padding:10px 16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+header h1{font-size:1.15em;margin:0}
+header small{opacity:.9}
+.bar button{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:.85em}
+.draft{background:var(--ok2);color:var(--ok);font-size:.8em;padding:4px 16px;text-align:center}
+main{max-width:1200px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.lesson{cursor:pointer;transition:transform .1s}
+.lesson:hover{transform:translateY(-2px);border-color:var(--pri)}
+.tag{display:inline-block;background:var(--pri2);color:var(--pri);border-radius:6px;padding:1px 8px;font-size:.78em;margin-right:4px}
+.btn{background:var(--pri);color:#fff;border:0;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:.95em}
+.btn.ghost{background:transparent;color:var(--pri);border:1px solid var(--pri)}
+.btn:disabled{opacity:.5;cursor:default}
+input,select,textarea{font:inherit;font-size:max(16px,1em);padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+textarea{width:100%;min-height:140px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tabs button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:20px;padding:6px 14px;cursor:pointer}
+.tabs button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.split{display:grid;grid-template-columns:1.1fr 1fr;gap:14px;align-items:start}
+.text{position:sticky;top:8px;max-height:calc(100vh - 20px);overflow:auto}
+.para{margin:0 0 10px;padding:6px 8px;border-radius:8px;white-space:pre-line}
+.para b.lb{color:var(--pri);margin-right:6px}
+.para.focus{outline:2px dashed var(--warn)}
+mark{background:var(--hl);color:inherit;border-radius:3px;padding:0 2px}
+mark.ok{background:var(--ok2);outline:1px solid var(--ok)}
+.gw{border-bottom:2px dotted var(--pri);cursor:help}
+#tip{position:fixed;z-index:9;background:var(--ink);color:var(--bg);padding:6px 10px;border-radius:8px;font-size:.85em;max-width:260px;display:none}
+.q{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.q .qh{font-weight:600}
+.opt{display:block;width:100%;text-align:left;margin:5px 0;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);cursor:pointer;font:inherit}
+.opt:hover{border-color:var(--pri)}
+.opt.right{background:var(--ok2);border-color:var(--ok);animation:pop .35s}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
+.opt.wrong{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.star{font-size:1.2em}
+.opt.wrong{background:var(--bad2);border-color:var(--bad);text-decoration:line-through}
+.fb{font-size:.9em;margin-top:6px;padding:6px 8px;border-radius:8px}
+.fb.hint{background:var(--warn2);color:var(--warn)}
+.fb.good{background:var(--ok2);color:var(--ok)}
+.fb.show{background:var(--bad2);color:var(--bad)}
+.skill{display:grid;grid-template-columns:240px 1fr 60px;gap:8px;align-items:center;margin:6px 0}
+.meter{height:12px;background:var(--line);border-radius:6px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--pri)}
+table{border-collapse:collapse;width:100%;font-size:.88em}
+th,td{border:1px solid var(--line);padding:4px 6px;text-align:center}
+th{background:var(--pri2)}
+td.l{text-align:left}
+.low{background:var(--bad2)}
+.warn{background:var(--warn2);color:var(--warn);border-color:var(--warn)}
+.big{font-size:1.25em;font-weight:700;color:var(--pri)}
+code.res{display:block;word-break:break-all;background:var(--pri2);padding:8px;border-radius:8px;font-size:.85em}
+.mute{color:var(--mute);font-size:.88em}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.gl{columns:2;font-size:.92em}
+footer{text-align:center;color:var(--mute);font-size:.78em;padding:16px}
+body.tv{--fs:22px}
+@media (max-width:820px){header{padding:8px 12px}header h1{font-size:1em}.bar{display:flex;flex-wrap:wrap;gap:4px}.bar button{padding:6px 8px}main{padding:12px}.card{padding:12px}.opt{padding:10px}.split{grid-template-columns:1fr}.text{position:static;max-height:none}.gl{columns:1}.skill{grid-template-columns:110px 1fr 50px}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>📖 Đọc Quê Mình 12 <small>· Read Local 12</small></h1><small id="who"></small></div>
+  <div class="bar">
+    <button onclick="go('home')">🏠 Bài đọc</button>
+    <button onclick="go('me')">📊 Kết quả của em</button>
+    <button onclick="go('gv')">🧑‍🏫 Giáo viên</button>
+    <button onclick="toggleTV()">📺 Chữ to</button>
+  </div>
+</header>
+<div class="draft">✅ Phiên bản 1.0 · Giáo viên đã duyệt nội dung ngày 30/10/2026 · Chạy không cần mạng · Chỉ ghi MÃ học sinh, không ghi họ tên</div>
+<main id="app"><div class="card" style="max-width:560px;margin:20px auto"><h2 style="margin-top:0">Đang mở học liệu…</h2><p>Nếu dòng chữ này <b>không tự mất đi</b>, em đang xem tệp trong Zalo hoặc trình xem tệp (không chạy được bài tập).</p><p><b>Cách sửa:</b> mở bằng <b>link web thầy gửi</b>, hoặc bấm <b>⋮ / Chia sẻ → Mở bằng trình duyệt</b> (Chrome trên Android, Safari trên iPhone).</p></div></main>
+<div id="tip"></div>
+<footer>Đọc Quê Mình 12 · Học liệu đọc hiểu Tiếng Anh 12 (Global Success) tích hợp ngữ liệu địa phương Tuy Phước · Sản phẩm sáng kiến của GV Tổ Tiếng Anh, THPT Số 1 Tuy Phước, năm học 2026–2027<br>Ngữ liệu do AI hỗ trợ soạn nháp, giáo viên kiểm chứng, biên tập và chịu trách nhiệm nội dung.<br>Phiên bản 1.0 (30/10/2026) – hoàn thiện từ bản nháp do trợ lý soạn, đã được giáo viên duyệt.</footer>
+<script>
+const DATA = {"lessons": [{"id": "L1", "unit": "Unit 1", "unitTitle": "Life stories we admire", "sgk": "SGK tr. 11 – bài đọc về Steve Jobs", "skill": "Reading for main ideas and specific information", "grammar": "Past simple vs. Past continuous", "title": "Xuan Dieu: A Life in Poetry", "local": "Nhà thơ Xuân Diệu – người con của Gò Bồi, Tuy Phước", "warmup": "Do you know any famous person who was born in Tuy Phuoc? What do you know about him or her?", "paragraphs": ["Many people in Tuy Phuoc feel proud when they hear the name Xuan Dieu. The poet, whose real name was Ngo Xuan Dieu, was born in 1916 in Go Boi, a small village in Tuy Phuoc. His father was a teacher from Ha Tinh, and his mother came from Binh Dinh.", "Xuan Dieu spent his early childhood near the lagoon and the salt fields of his hometown. While he was growing up, he often listened to folk songs and stories from his mother. Later, he studied in Quy Nhon, then in Ha Noi and Hue. During his school years, he was reading French and Vietnamese poetry and writing his own poems in secret.", "In 1938, he published his first collection of poems, Tho Tho. Readers were surprised by his fresh and passionate voice. He wrote about love, youth and the fear that time was passing too quickly. Because of these themes, many people later called him 'the king of love poetry'. He was also one of the leading poets of the New Poetry Movement.", "After 1945, Xuan Dieu continued to write poems, essays and literary criticism. He travelled to many places and gave talks to students and young writers. He worked hard all his life and left hundreds of poems behind when he died in Ha Noi in 1985.", "Today, there is a memorial house dedicated to Xuan Dieu in his home village. Students from local schools often visit it to learn about his life. For many young people in Tuy Phuoc, his story is a reminder that a small place can raise a great talent, and that hard work can turn a dream into a lasting achievement."], "glossary": [["proud", "/praʊd/", "tự hào"], ["childhood", "/ˈtʃaɪldhʊd/", "thời thơ ấu"], ["folk songs", "/fəʊk sɒŋz/", "dân ca"], ["in secret", "/ɪn ˈsiːkrət/", "một cách bí mật, lén"], ["collection", "/kəˈlekʃn/", "tập (thơ), bộ sưu tập"], ["passionate", "/ˈpæʃənət/", "nồng nàn, say mê"], ["literary criticism", "/ˈlɪtərəri ˈkrɪtɪsɪzəm/", "phê bình văn học"], ["memorial house", "/məˈmɔːriəl haʊs/", "nhà lưu niệm"], ["dedicated to", "/ˈdedɪkeɪtɪd tə/", "dành để tưởng nhớ"], ["lasting achievement", "/ˈlɑːstɪŋ əˈtʃiːvmənt/", "thành tựu bền lâu"]], "questions": [{"type": "main", "q": "Which is the best title for the whole text?", "options": ["From Go Boi to 'the king of love poetry'", "The salt fields of Tuy Phuoc", "How to write a love poem", "A trip to Ha Noi in 1985"], "answer": 0, "evidence": "Many people in Tuy Phuoc feel proud when they hear the name Xuan Dieu.", "hint": "Đọc câu đầu mỗi đoạn: cả bài kể về ai, từ đâu đến đâu?", "explain": "Cả bài kể đời Xuân Diệu từ lúc sinh ở Gò Bồi đến khi thành nhà thơ nổi tiếng."}, {"type": "heading", "q": "Which heading best fits paragraph B?", "options": ["A visit to the memorial house", "A childhood that shaped a poet", "His work after 1945", "Famous poems about the sea"], "answer": 1, "evidence": "Xuan Dieu spent his early childhood near the lagoon", "hint": "Đoạn B nói về giai đoạn nào trong đời ông?", "explain": "Đoạn B kể tuổi thơ, dân ca từ mẹ, việc học và tập làm thơ – những điều hình thành nhà thơ."}, {"type": "heading", "q": "Which heading best fits paragraph C?", "options": ["A first book and a new voice", "Leaving his hometown", "Teaching young writers", "Life in the salt fields"], "answer": 0, "evidence": "In 1938, he published his first collection of poems, Tho Tho.", "hint": "Tìm mốc năm và sự kiện chính trong đoạn C.", "explain": "Đoạn C nói về tập thơ đầu tay (1938) và giọng thơ mới lạ của ông."}, {"type": "detail", "q": "Where was Xuan Dieu born?", "options": ["In Quy Nhon", "In Hue", "In Go Boi", "In Ha Noi"], "answer": 2, "evidence": "was born in 1916 in Go Boi, a small village in Tuy Phuoc", "hint": "Quét (scan) tìm từ 'born'.", "explain": "Câu: '...was born in 1916 in Go Boi, a small village in Tuy Phuoc'."}, {"type": "detail", "q": "What did he do in secret during his school years?", "options": ["He sold salt", "He wrote his own poems", "He learned to sing folk songs", "He travelled to France"], "answer": 1, "evidence": "writing his own poems in secret", "hint": "Tìm cụm 'in secret' trong đoạn B.", "explain": "'...he was reading French and Vietnamese poetry and writing his own poems in secret.'"}, {"type": "detail", "q": "Which theme is NOT mentioned in paragraph C?", "options": ["love", "youth", "war", "time passing quickly"], "answer": 2, "evidence": "He wrote about love, youth and the fear that time was passing too quickly.", "hint": "Đánh dấu từng chủ đề có trong câu 'He wrote about...' rồi loại trừ.", "explain": "Đoạn C nêu love, youth, time passing – không nhắc 'war'."}, {"type": "tfng", "q": "His mother came from Ha Tinh.", "options": ["True", "False", "Not Given"], "answer": 1, "evidence": "His father was a teacher from Ha Tinh, and his mother came from Binh Dinh.", "hint": "Cẩn thận: bài nói ai đến từ Hà Tĩnh?", "explain": "Cha ông người Hà Tĩnh; mẹ người Bình Định → False."}, {"type": "tfng", "q": "Tho Tho was published in 1938.", "options": ["True", "False", "Not Given"], "answer": 0, "evidence": "In 1938, he published his first collection of poems, Tho Tho.", "hint": "So mốc năm trong câu hỏi với đoạn C.", "explain": "Khớp hoàn toàn với đoạn C → True."}, {"type": "tfng", "q": "Xuan Dieu won an international prize for his poems.", "options": ["True", "False", "Not Given"], "answer": 2, "evidence": "", "hint": "Bài có nhắc giải thưởng quốc tế nào không? Không có thông tin ≠ sai.", "explain": "Bài không nói gì về giải thưởng quốc tế → Not Given."}, {"type": "vocab", "q": "The word 'collection' in paragraph C is closest in meaning to ____.", "options": ["a group of poems published together", "a library", "a single poem", "a school subject"], "answer": 0, "evidence": "first collection of poems", "hint": "Đọc cụm đi kèm: 'collection of poems'.", "explain": "'collection of poems' = tập thơ – nhiều bài thơ in chung."}, {"type": "vocab", "q": "The phrase 'dedicated to' in paragraph E means ____.", "options": ["sold to", "built in honour of", "far away from", "closed to"], "answer": 1, "evidence": "a memorial house dedicated to Xuan Dieu", "hint": "Nhà lưu niệm được làm để làm gì?", "explain": "'dedicated to' = dành để tưởng nhớ, tôn vinh."}, {"type": "inference", "q": "What can be inferred from paragraph E?", "options": ["Local students see Xuan Dieu as a role model.", "The memorial house is closed to students.", "Young people in Tuy Phuoc do not like poetry.", "Xuan Dieu moved back to Go Boi in 1985."], "answer": 0, "evidence": "his story is a reminder that a small place can raise a great talent", "hint": "Câu cuối đoạn E cho biết người trẻ nghĩ gì về câu chuyện của ông?", "explain": "Câu chuyện của ông 'là lời nhắc' rằng nơi nhỏ cũng sinh tài năng → HS coi ông là tấm gương."}], "after": "Write 60–80 words about a person from your hometown you admire. Use the past simple and the past continuous.", "facts": ["Xuân Diệu tên thật Ngô Xuân Diệu, sinh năm 1916 tại Gò Bồi (Tuy Phước)", "Cha người Hà Tĩnh, làm nghề dạy học; mẹ người Bình Định", "Học ở Quy Nhơn, Hà Nội, Huế", "Tập thơ đầu 'Thơ thơ' in năm 1938; là gương mặt tiêu biểu của phong trào Thơ mới", "Mất năm 1985 tại Hà Nội", "Có nhà lưu niệm Xuân Diệu tại quê nhà"]}, {"id": "L2", "unit": "Unit 2", "unitTitle": "A multicultural world", "sgk": "SGK tr. 23 – bài đọc về toàn cầu hoá và đa dạng văn hoá", "skill": "Reading for main ideas and specific information", "grammar": "Articles (review and extension)", "title": "Banh It Towers: Where Cultures Meet", "local": "Cụm tháp Chăm Bánh Ít (Phước Hiệp, Tuy Phước)", "warmup": "Look at the photo of Banh It Towers. Who built them? Why do you think they have this name?", "paragraphs": ["On a low hill in Phuoc Hiep, Tuy Phuoc, stand four old brick towers. Local people call them Thap Banh It because, from far away, the main tower looks like a 'banh it', a small sticky rice cake. French visitors in the past gave them another name: the Silver Towers.", "The towers were built by the Cham people around the end of the 11th century and the beginning of the 12th century. At that time, this area was part of the Champa kingdom. The builders used red bricks so skilfully that, even today, experts are still not completely sure how the bricks were joined together.", "Over the centuries, the land changed hands, and Vietnamese, Cham and other cultures lived side by side. You can still see this mixture in the culture of the region: in the martial arts, in the music of tuong, the classical opera, and in local festivals and food. A culture is rarely 'pure'; it grows by meeting others.", "Today, Banh It is an important historical site. It welcomes visitors from many parts of Viet Nam and from other countries. For young people in Tuy Phuoc, the towers are a great place to practise English: by introducing them to foreign tourists, students can improve their language skills and learn more about their own heritage at the same time.", "Globalisation brings both chances and challenges. More tourists mean more jobs and more money for the community, but they may also bring litter, noise and damage to old buildings. To protect the towers, visitors are asked not to climb on the walls and to take their rubbish with them. Preserving cultural diversity starts with respecting the places that tell our shared story."], "glossary": [["brick", "/brɪk/", "gạch"], ["sticky rice", "/ˈstɪki raɪs/", "gạo nếp"], ["kingdom", "/ˈkɪŋdəm/", "vương quốc"], ["skilfully", "/ˈskɪlfəli/", "một cách khéo léo"], ["side by side", "/saɪd baɪ saɪd/", "song song, cạnh nhau"], ["martial arts", "/ˌmɑːʃl ˈɑːts/", "võ thuật"], ["heritage", "/ˈherɪtɪdʒ/", "di sản"], ["globalisation", "/ˌɡləʊbəlaɪˈzeɪʃn/", "toàn cầu hoá"], ["litter", "/ˈlɪtə(r)/", "rác vứt bừa bãi"], ["preserve", "/prɪˈzɜːv/", "bảo tồn"]], "questions": [{"type": "main", "q": "What is the text mainly about?", "options": ["How to cook banh it", "Banh It Towers as a meeting place of cultures", "The history of French tourists in Viet Nam", "Martial arts in Tuy Phuoc"], "answer": 1, "evidence": "Where Cultures Meet", "hint": "Nhìn tiêu đề và câu cuối của đoạn C, E.", "explain": "Bài nói về tháp Bánh Ít và sự giao thoa văn hoá Chăm – Việt."}, {"type": "heading", "q": "Which heading best fits paragraph B?", "options": ["Who built the towers and how", "Rules for visitors", "A cake with a long history", "Jobs for young people"], "answer": 0, "evidence": "The towers were built by the Cham people", "hint": "Đoạn B trả lời câu hỏi 'ai xây' và 'xây thế nào'.", "explain": "Đoạn B: người Chăm xây, cuối thế kỉ XI – đầu XII, gạch đỏ ghép khéo."}, {"type": "heading", "q": "Which heading best fits paragraph E?", "options": ["A mixture of music and food", "Tourism: benefits and risks", "The Silver Towers", "Learning English at school"], "answer": 1, "evidence": "Globalisation brings both chances and challenges.", "hint": "Câu chủ đề đoạn E có hai từ đối lập nhau.", "explain": "'chances and challenges' → lợi ích và rủi ro của du lịch."}, {"type": "detail", "q": "Why do local people call them Thap Banh It?", "options": ["They were built by cake makers.", "The main tower looks like a small rice cake from far away.", "People sell cakes near the towers.", "The towers are white like rice."], "answer": 1, "evidence": "from far away, the main tower looks like a 'banh it', a small sticky rice cake", "hint": "Tìm từ 'because' trong đoạn A.", "explain": "Nhìn từ xa, tháp chính giống chiếc bánh ít."}, {"type": "detail", "q": "How many towers are there on the hill?", "options": ["two", "three", "four", "five"], "answer": 2, "evidence": "stand four old brick towers", "hint": "Quét tìm con số trong đoạn A.", "explain": "'...stand four old brick towers.'"}, {"type": "detail", "q": "According to paragraph C, where can we see the mixture of cultures?", "options": ["Only in old buildings", "In martial arts, tuong music, festivals and food", "Only in the English language", "In modern shopping centres"], "answer": 1, "evidence": "in the martial arts, in the music of tuong, the classical opera, and in local festivals and food", "hint": "Liệt kê các cụm bắt đầu bằng 'in the...' ở đoạn C.", "explain": "Đoạn C liệt kê võ thuật, nhạc tuồng, lễ hội và ẩm thực."}, {"type": "tfng", "q": "The towers were built by the French.", "options": ["True", "False", "Not Given"], "answer": 1, "evidence": "The towers were built by the Cham people", "hint": "Người Pháp làm gì với tháp theo đoạn A?", "explain": "Người Chăm xây; người Pháp chỉ đặt tên 'Silver Towers' → False."}, {"type": "tfng", "q": "Experts fully understand how the bricks were joined.", "options": ["True", "False", "Not Given"], "answer": 1, "evidence": "experts are still not completely sure how the bricks were joined together", "hint": "'fully understand' ngược nghĩa với cụm nào trong đoạn B?", "explain": "Bài nói các chuyên gia 'vẫn chưa hoàn toàn chắc' → False."}, {"type": "tfng", "q": "Foreign tourists pay a higher entrance fee than Vietnamese visitors.", "options": ["True", "False", "Not Given"], "answer": 2, "evidence": "", "hint": "Bài có nói gì về vé vào cửa không?", "explain": "Không có thông tin về vé → Not Given."}, {"type": "vocab", "q": "The word 'heritage' in paragraph D is closest in meaning to ____.", "options": ["money from tourism", "things from the past that a community values", "a foreign language", "a modern building"], "answer": 1, "evidence": "learn more about their own heritage", "hint": "'their own heritage' gắn với tháp cổ và lịch sử.", "explain": "heritage = di sản: giá trị từ quá khứ được cộng đồng gìn giữ."}, {"type": "vocab", "q": "The word 'preserving' in paragraph E is closest in meaning to ____.", "options": ["protecting", "selling", "building", "forgetting"], "answer": 0, "evidence": "Preserving cultural diversity starts with respecting the places", "hint": "Đoạn E đang nói về bảo vệ tháp.", "explain": "preserve = bảo tồn, giữ gìn."}, {"type": "inference", "q": "What is the writer's attitude towards globalisation?", "options": ["Completely negative", "Completely positive", "Balanced – it has both good and bad sides", "Not interested"], "answer": 2, "evidence": "Globalisation brings both chances and challenges.", "hint": "Tác giả nêu mặt nào của toàn cầu hoá?", "explain": "Tác giả nêu cả cơ hội (việc làm, thu nhập) lẫn thách thức (rác, ồn, hư hại) → cân bằng."}], "after": "Write 60–80 words to introduce a historical site in your area to a foreign visitor. Pay attention to 'a/an/the'.", "facts": ["Tháp Bánh Ít ở Phước Hiệp (Tuy Phước), gồm 4 tháp trên đồi", "Người Pháp gọi là 'Tours d'Argent' (Tháp Bạc)", "Xây khoảng cuối thế kỉ XI – đầu thế kỉ XII, thời Champa", "Kĩ thuật kết dính gạch của người Chăm chưa được giải thích trọn vẹn"]}, {"id": "L3", "unit": "Unit 3", "unitTitle": "Green living", "sgk": "SGK tr. 35 – thư điện tử về sống xanh, hạn chế nhựa", "skill": "Reading for main ideas and specific information in emails", "grammar": "Verbs with prepositions; relative clauses referring to a whole sentence", "title": "Green Days by Thi Nai Lagoon", "local": "Đầm Thị Nại và rừng ngập mặn – rác nhựa ven đầm", "warmup": "Have you ever been to Thi Nai Lagoon? What do you see along the shore?", "paragraphs": ["Hi Emma,\nLast Sunday, my class joined a clean-up near Thi Nai Lagoon. Along the shore there are mangrove forests, which surprised me because I had never looked at them closely before. Mangrove trees protect the villages from big waves and storms. Fish, crabs and many kinds of birds live among their roots.", "Sadly, the lagoon is suffering from plastic waste. Bags, bottles and foam boxes are washed in by the tide and get stuck between the roots, which makes the water dirty and harms the animals. In three hours, we filled many big sacks with rubbish, and we were all shocked by the amount.", "Since then, my family has made a few small changes. We take cloth bags to the market and refill our water bottles instead of buying new ones. My grandmother still wraps sticky rice cakes in banana leaves, which is much greener than using plastic. At school, our class has started to separate paper from other rubbish. What do people in your town do to go green?\nBest wishes,\nLan", "Hi Lan,\nThanks for your email! Your clean-up sounds amazing. In my town, some shops let customers refill their own containers with rice, pasta and shampoo. We also get a little money back when we return plastic bottles, so people rarely throw them away.", "Here is an idea for your school: why not start a 'No-Plastic Monday'? On that day, everyone brings their own bottle and lunch box. It is simple, and it helps students think about their habits every week. Please send me some photos of the mangroves – I would love to see them!\nLove,\nEmma"], "glossary": [["lagoon", "/ləˈɡuːn/", "đầm phá"], ["mangrove", "/ˈmæŋɡrəʊv/", "cây ngập mặn (đước, mắm…)"], ["shore", "/ʃɔː(r)/", "bờ"], ["tide", "/taɪd/", "thuỷ triều"], ["foam box", "/fəʊm bɒks/", "hộp xốp"], ["sack", "/sæk/", "bao tải"], ["refill", "/ˌriːˈfɪl/", "đổ đầy lại"], ["separate … from …", "/ˈsepəreɪt/", "tách … ra khỏi …"], ["container", "/kənˈteɪnə(r)/", "đồ đựng, hộp chứa"], ["habit", "/ˈhæbɪt/", "thói quen"]], "questions": [{"type": "main", "q": "What is the main purpose of Lan's email?", "options": ["To ask Emma for money", "To tell a friend about a green activity and local problems", "To complain about her school", "To invite Emma to a wedding"], "answer": 1, "evidence": "Last Sunday, my class joined a clean-up near Thi Nai Lagoon.", "hint": "Thư của Lan kể về việc gì và hỏi Emma điều gì?", "explain": "Lan kể buổi nhặt rác, vấn đề rác nhựa và việc làm xanh, rồi hỏi kinh nghiệm của Emma."}, {"type": "heading", "q": "Which heading best fits paragraph A?", "options": ["Why the mangroves matter", "Shopping in the UK", "A new school rule", "Cooking with banana leaves"], "answer": 0, "evidence": "Mangrove trees protect the villages from big waves and storms.", "hint": "Đoạn A nói rừng ngập mặn có ích gì?", "explain": "Đoạn A: rừng ngập mặn chắn sóng, bão và là nơi sống của cá, cua, chim."}, {"type": "heading", "q": "Which heading best fits paragraph C?", "options": ["Problems at the market", "Small green habits at home and school", "A trip to Emma's town", "How storms are formed"], "answer": 1, "evidence": "Since then, my family has made a few small changes.", "hint": "Câu đầu đoạn C là câu chủ đề.", "explain": "Đoạn C liệt kê thay đổi nhỏ của gia đình và lớp Lan."}, {"type": "detail", "q": "According to Lan, mangrove trees protect the villages from ____.", "options": ["plastic bags", "big waves and storms", "hot weather", "tourists"], "answer": 1, "evidence": "protect the villages from big waves and storms", "hint": "Động từ + giới từ: 'protect … from …'.", "explain": "'protect the villages from big waves and storms'."}, {"type": "detail", "q": "What does Lan's grandmother use instead of plastic?", "options": ["paper bags", "foam boxes", "banana leaves", "glass jars"], "answer": 2, "evidence": "My grandmother still wraps sticky rice cakes in banana leaves", "hint": "Tìm 'grandmother' trong đoạn C.", "explain": "Bà gói bánh bằng lá chuối."}, {"type": "detail", "q": "What does Emma suggest for Lan's school?", "options": ["Selling plastic bottles", "A 'No-Plastic Monday'", "Closing the canteen", "Planting rice"], "answer": 1, "evidence": "why not start a 'No-Plastic Monday'?", "hint": "Cấu trúc gợi ý 'why not…?' ở đoạn E.", "explain": "Emma gợi ý 'No-Plastic Monday'."}, {"type": "tfng", "q": "Lan's class did the clean-up last Sunday.", "options": ["True", "False", "Not Given"], "answer": 0, "evidence": "Last Sunday, my class joined a clean-up", "hint": "So thời gian trong câu hỏi với đoạn A.", "explain": "Khớp đoạn A → True."}, {"type": "tfng", "q": "Emma lives near a lagoon.", "options": ["True", "False", "Not Given"], "answer": 2, "evidence": "", "hint": "Emma có nói nơi mình sống gần đầm không?", "explain": "Emma chỉ kể về cửa hàng và việc trả chai; không nói về đầm → Not Given."}, {"type": "tfng", "q": "In Emma's town, people can refill their own containers at some shops.", "options": ["True", "False", "Not Given"], "answer": 0, "evidence": "some shops let customers refill their own containers", "hint": "Tìm 'refill' trong thư của Emma.", "explain": "Khớp đoạn D → True."}, {"type": "vocab", "q": "In paragraph B, 'washed in by the tide' means ____.", "options": ["cleaned with water", "carried to the shore by the water", "thrown away by people", "burnt by the sun"], "answer": 1, "evidence": "are washed in by the tide", "hint": "Nước triều đưa rác đi đâu?", "explain": "Rác bị thuỷ triều cuốn dạt vào bờ."}, {"type": "vocab", "q": "In '...wraps sticky rice cakes in banana leaves, which is much greener...', the word 'which' refers to ____.", "options": ["banana leaves", "the grandmother", "the whole idea of wrapping cakes in banana leaves", "plastic"], "answer": 2, "evidence": "which is much greener than using plastic", "hint": "Có dấu phẩy trước 'which' và động từ 'is' – chú ý mệnh đề quan hệ thay cho cả câu.", "explain": "', which' thay cho cả việc gói bánh bằng lá chuối (mệnh đề quan hệ bổ nghĩa cả câu – trọng tâm ngữ pháp Unit 3)."}, {"type": "inference", "q": "What will Lan probably do next?", "options": ["Send Emma some photos of the mangroves", "Move to Emma's town", "Stop using cloth bags", "Buy more foam boxes"], "answer": 0, "evidence": "Please send me some photos of the mangroves", "hint": "Câu cuối thư Emma đề nghị gì?", "explain": "Emma xin ảnh rừng ngập mặn → nhiều khả năng Lan sẽ gửi ảnh."}], "after": "Write a short email (60–80 words) to a friend about one green habit you have started. Use one relative clause with ', which'.", "facts": ["Ven đầm Thị Nại có rừng ngập mặn", "Rừng ngập mặn giúp chắn sóng, giảm tác động bão; là nơi sống của cá, cua, chim (kiến thức chung)", "Thư của Lan và Emma là thư hư cấu để học – không phải sự kiện thật"]}, {"id": "L4", "unit": "Unit 4", "unitTitle": "Urbanisation", "sgk": "SGK tr. 52 – bài đọc về đô thị hoá Hà Nội", "skill": "Reading for main ideas and specific information in an article", "grammar": "Present perfect; double comparatives to show change", "title": "Tuy Phuoc: A Rural Area on the Move", "local": "Đô thị hoá ở Tuy Phước – ven Quy Nhơn", "warmup": "How is your village or neighbourhood different from ten years ago?", "paragraphs": ["For a long time, Tuy Phuoc was mainly a rural area. Most families lived on farming, fishing and making salt, and green rice fields stretched along the roads. Life was quiet, and many people spent their whole lives in the same village.", "In recent years, the area has changed a lot. New roads and bridges have connected it more closely with Quy Nhon, and Dieu Tri railway station has made travel to other provinces easier. Shops, cafés and small factories have appeared, and some farmland has been turned into housing areas.", "Many young people now leave their villages to study or work in industrial zones, in Quy Nhon or in big cities such as Ho Chi Minh City. The more jobs the cities offer, the more young people move away. Some of them come back at weekends; others only return for Tet.", "Urbanisation has brought clear benefits. Many families now have higher incomes. Schools and health services have improved, and almost every home can access the internet. People can buy goods and use services that were only available in the city before.", "However, growth also has another side. The roads are getting busier and busier, and there is less and less farmland. In some villages, older people live alone because their children work far away. Some traditional crafts are also at risk because fewer young people want to learn them.", "The challenge for the future is to develop without losing what makes the area special. If planners keep green spaces, protect the lagoon and support local crafts, Tuy Phuoc can become more modern and still feel like home."], "glossary": [["rural", "/ˈrʊərəl/", "thuộc nông thôn"], ["stretch", "/stretʃ/", "trải dài"], ["connect … with …", "/kəˈnekt/", "nối … với …"], ["farmland", "/ˈfɑːmlænd/", "đất nông nghiệp"], ["industrial zone", "/ɪnˈdʌstriəl zəʊn/", "khu công nghiệp"], ["income", "/ˈɪnkʌm/", "thu nhập"], ["access", "/ˈækses/", "truy cập, tiếp cận"], ["at risk", "/ət rɪsk/", "có nguy cơ (mai một)"], ["traditional craft", "/trəˈdɪʃənl krɑːft/", "nghề thủ công truyền thống"], ["planner", "/ˈplænə(r)/", "nhà quy hoạch"]], "questions": [{"type": "main", "q": "What is the article mainly about?", "options": ["How to grow rice", "How urbanisation is changing Tuy Phuoc", "The history of Dieu Tri station", "Holidays in Ho Chi Minh City"], "answer": 1, "evidence": "In recent years, the area has changed a lot.", "hint": "Tiêu đề 'on the move' + câu chủ đề các đoạn.", "explain": "Bài nói quá trình đô thị hoá và tác động ở Tuy Phước."}, {"type": "heading", "q": "Which heading best fits paragraph B?", "options": ["New roads, new buildings", "Life in the past", "Problems for older people", "Plans for the future"], "answer": 0, "evidence": "New roads and bridges have connected it more closely with Quy Nhon", "hint": "Đoạn B liệt kê những thứ mới xuất hiện.", "explain": "Đường, cầu, ga, cửa hàng, nhà máy, khu dân cư mới."}, {"type": "heading", "q": "Which heading best fits paragraph E?", "options": ["Better schools", "The other side of growth", "Moving to the city", "A quiet village life"], "answer": 1, "evidence": "However, growth also has another side.", "hint": "Từ nối 'However' báo hiệu điều gì?", "explain": "Đoạn E nêu mặt trái: giao thông, mất đất, người già cô đơn, nghề truyền thống."}, {"type": "detail", "q": "In the past, most families in Tuy Phuoc lived on ____.", "options": ["tourism and trade", "farming, fishing and making salt", "factory work", "selling cars"], "answer": 1, "evidence": "Most families lived on farming, fishing and making salt", "hint": "Cụm 'lived on' ở đoạn A.", "explain": "Làm ruộng, đánh cá, làm muối."}, {"type": "detail", "q": "Which benefit is NOT mentioned in paragraph D?", "options": ["higher incomes", "better health services", "internet access", "cheaper houses"], "answer": 3, "evidence": "Many families now have higher incomes.", "hint": "Gạch chân từng lợi ích trong đoạn D rồi loại trừ.", "explain": "Đoạn D không nhắc nhà rẻ hơn."}, {"type": "detail", "q": "What has made travel to other provinces easier?", "options": ["A new airport", "Dieu Tri railway station", "A new port", "Motorbike taxis"], "answer": 1, "evidence": "Dieu Tri railway station has made travel to other provinces easier", "hint": "Tìm 'travel' trong đoạn B.", "explain": "Ga Diêu Trì giúp đi các tỉnh thuận tiện."}, {"type": "tfng", "q": "Some farmland has been turned into housing areas.", "options": ["True", "False", "Not Given"], "answer": 0, "evidence": "some farmland has been turned into housing areas", "hint": "Chú ý thì hiện tại hoàn thành ở đoạn B.", "explain": "Khớp đoạn B → True."}, {"type": "tfng", "q": "Fewer young people are leaving their villages than before.", "options": ["True", "False", "Not Given"], "answer": 1, "evidence": "The more jobs the cities offer, the more young people move away.", "hint": "So sánh kép ở đoạn C nói xu hướng nào?", "explain": "Bài nói ngày càng nhiều người trẻ rời đi → False."}, {"type": "tfng", "q": "The population of Tuy Phuoc has doubled in the last ten years.", "options": ["True", "False", "Not Given"], "answer": 2, "evidence": "", "hint": "Bài có số liệu dân số không?", "explain": "Không có số liệu dân số → Not Given."}, {"type": "vocab", "q": "The phrase 'on the move' in the title means ____.", "options": ["changing and developing", "travelling by train", "moving house", "staying the same"], "answer": 0, "evidence": "In recent years, the area has changed a lot.", "hint": "Cả bài nói vùng đất này đang thế nào?", "explain": "'on the move' = đang chuyển mình, phát triển."}, {"type": "vocab", "q": "'The more jobs the cities offer, the more young people move away.' This sentence means ____.", "options": ["Cities offer fewer jobs to young people.", "More jobs in cities lead to more young people leaving.", "Young people create jobs in cities.", "Young people move away only for Tet."], "answer": 1, "evidence": "The more jobs the cities offer, the more young people move away.", "hint": "So sánh kép 'the more…, the more…' = càng… càng….", "explain": "Thành phố càng nhiều việc, người trẻ càng rời quê (trọng tâm ngữ pháp Unit 4)."}, {"type": "inference", "q": "What does the writer most likely believe?", "options": ["Urbanisation should stop completely.", "Development should be planned so the area keeps its green spaces and traditions.", "Traditional crafts are no longer useful.", "Young people should never leave their villages."], "answer": 1, "evidence": "The challenge for the future is to develop without losing what makes the area special.", "hint": "Đọc kĩ đoạn cuối – tác giả đặt điều kiện 'If…'.", "explain": "Tác giả ủng hộ phát triển có quy hoạch, giữ bản sắc."}], "after": "Write 60–80 words about how your neighbourhood has changed. Use the present perfect and one double comparative.", "facts": ["Ga Diêu Trì nằm trên địa bàn Tuy Phước, là ga lớn trên tuyến Bắc – Nam", "Nghề truyền thống ở Tuy Phước gồm làm ruộng, đánh bắt, làm muối (khái quát)", "Từ 2025, Tuy Phước là xã thuộc tỉnh Gia Lai sau sắp xếp đơn vị hành chính (bài không nêu, thầy cân nhắc bổ sung)", "Các nhận định về thu nhập, internet, giao thông là khái quát – không có số liệu"]}, {"id": "L5", "unit": "Unit 5", "unitTitle": "The world of work", "sgk": "SGK tr. 64 – quảng cáo việc làm (main ideas, specific information, inference)", "skill": "Reading for main ideas, specific information and inference in job advertisements", "grammar": "Simple, compound and complex sentences", "title": "Local Jobs for Young People", "local": "Việc làm gắn với du lịch di sản, nghề thủ công và thuỷ sản quê nhà", "warmup": "What jobs are popular in your hometown? Which one would you like to try?", "paragraphs": ["JOB 1 – HERITAGE TOUR ASSISTANT (part-time, weekends)\nA local tour company is looking for friendly young people to help with weekend tours to Banh It Towers and Xuan Dieu Memorial House. You will welcome visitors, give short introductions in English and help with tickets and photos. Requirements: aged 18 or over, good communication skills, English at B1 level or above. Knowledge of local history is a plus. We offer free training and flexible hours. Send your CV by email before 30 June.", "JOB 2 – CRAFT WORKSHOP TRAINEE\nDo you love beautiful handmade things? A traditional craft workshop in the region is training new workers to make non ngua, the famous horse-riding hats of Binh Dinh. You will learn every step from experienced artisans. No experience is required, but you need patience and skilful hands. Trainees receive a monthly allowance during the six-month course. After training, good workers can help sell products online.", "JOB 3 – CUSTOMER SERVICE STAFF (full-time)\nA seafood company near Thi Nai Lagoon needs staff to answer phone calls and online orders. Applicants should have a high school diploma, good computer skills and basic English. The job involves shift work, including some weekends. Salary is negotiable, and staff receive health insurance. Apply in person at the company office from Monday to Friday.", "Note: These advertisements were written for learning purposes. The companies are not real."], "glossary": [["heritage tour", "/ˈherɪtɪdʒ tʊə(r)/", "tour tham quan di sản"], ["requirement", "/rɪˈkwaɪəmənt/", "yêu cầu"], ["a plus", "/ə plʌs/", "điểm cộng, lợi thế"], ["flexible hours", "/ˈfleksəbl ˈaʊəz/", "giờ giấc linh hoạt"], ["trainee", "/ˌtreɪˈniː/", "học viên, người học việc"], ["artisan", "/ˌɑːtɪˈzæn/", "nghệ nhân"], ["allowance", "/əˈlaʊəns/", "tiền trợ cấp"], ["shift work", "/ʃɪft wɜːk/", "làm theo ca"], ["negotiable", "/nɪˈɡəʊʃiəbl/", "có thể thương lượng"], ["apply in person", "/əˈplaɪ ɪn ˈpɜːsn/", "nộp đơn trực tiếp"]], "questions": [{"type": "main", "q": "What is the main purpose of these texts?", "options": ["To advertise jobs", "To tell a story about a tour guide", "To teach people how to make hats", "To sell seafood"], "answer": 0, "evidence": "is looking for friendly young people", "hint": "Nhìn cấu trúc chung: tên việc – yêu cầu – quyền lợi – cách nộp.", "explain": "Cả ba văn bản là quảng cáo tuyển dụng."}, {"type": "detail", "q": "Which job does NOT require any previous experience?", "options": ["Job 1", "Job 2", "Job 3", "None of them"], "answer": 1, "evidence": "No experience is required", "hint": "Tìm cụm 'experience' trong cả 3 quảng cáo.", "explain": "Job 2 ghi rõ 'No experience is required'."}, {"type": "detail", "q": "Which job(s) may involve working at weekends?", "options": ["Only Job 1", "Only Job 3", "Job 1 and Job 3", "All three jobs"], "answer": 2, "evidence": "including some weekends", "hint": "Job 1 'weekends' và Job 3 'shift work, including some weekends'.", "explain": "Job 1 làm cuối tuần; Job 3 có ca cuối tuần."}, {"type": "detail", "q": "For Job 1, what is useful but NOT required?", "options": ["Being 18 or over", "B1 English", "Knowledge of local history", "Good communication skills"], "answer": 2, "evidence": "Knowledge of local history is a plus.", "hint": "'a plus' khác 'requirement' thế nào?", "explain": "'is a plus' = lợi thế, không bắt buộc."}, {"type": "detail", "q": "What do trainees in Job 2 receive during the course?", "options": ["Health insurance", "A monthly allowance", "Free tickets", "A company car"], "answer": 1, "evidence": "Trainees receive a monthly allowance", "hint": "Tìm 'receive' trong Job 2.", "explain": "Học viên nhận trợ cấp hằng tháng."}, {"type": "tfng", "q": "Heritage tour assistants must have a university degree.", "options": ["True", "False", "Not Given"], "answer": 2, "evidence": "", "hint": "Phần 'Requirements' của Job 1 có nhắc bằng đại học không?", "explain": "Không nhắc bằng cấp → Not Given."}, {"type": "tfng", "q": "The customer service job is part-time.", "options": ["True", "False", "Not Given"], "answer": 1, "evidence": "CUSTOMER SERVICE STAFF (full-time)", "hint": "Xem chữ trong ngoặc ở tên việc.", "explain": "Job 3 là full-time → False."}, {"type": "tfng", "q": "People who want Job 1 should send their CV by email.", "options": ["True", "False", "Not Given"], "answer": 0, "evidence": "Send your CV by email before 30 June.", "hint": "Câu cuối Job 1.", "explain": "Khớp → True."}, {"type": "vocab", "q": "The phrase 'a plus' in Job 1 is closest in meaning to ____.", "options": ["a problem", "an advantage", "a rule", "a test"], "answer": 1, "evidence": "is a plus", "hint": "Dấu cộng gợi nghĩa gì?", "explain": "a plus = điểm cộng, lợi thế."}, {"type": "vocab", "q": "The word 'negotiable' in Job 3 means ____.", "options": ["fixed and cannot change", "can be discussed and agreed", "very low", "paid every day"], "answer": 1, "evidence": "Salary is negotiable", "hint": "negotiate = thương lượng.", "explain": "Lương có thể thương lượng."}, {"type": "inference", "q": "A student who speaks English well and loves history would probably choose ____.", "options": ["Job 1", "Job 2", "Job 3", "none of the jobs"], "answer": 0, "evidence": "give short introductions in English", "hint": "Việc nào dùng tiếng Anh để giới thiệu di tích?", "explain": "Job 1 cần tiếng Anh và có lợi thế nếu biết lịch sử địa phương."}, {"type": "inference", "q": "Which job would best suit someone who wants stable, long-term work with insurance?", "options": ["Job 1", "Job 2", "Job 3", "Job 1 and Job 2"], "answer": 2, "evidence": "staff receive health insurance", "hint": "Việc nào full-time và có bảo hiểm?", "explain": "Job 3: toàn thời gian, có bảo hiểm y tế."}], "after": "Write a short job advertisement (60–80 words) for a job in your hometown. Use at least one complex sentence.", "facts": ["Nón ngựa là nghề thủ công nổi tiếng của Bình Định (không ghi địa danh làng cụ thể)", "Ba quảng cáo là hư cấu để học, đã ghi chú trong bài"]}]};
+const TYPES = {main:"Ý chính toàn bài",heading:"Ý chính đoạn",detail:"Thông tin chi tiết",tfng:"True / False / Not Given",vocab:"Từ vựng – ngữ pháp trong ngữ cảnh",inference:"Suy luận"};
+const ART = {
+ L1:'<svg viewBox="0 0 120 70" width="100%" height="70"><rect width="120" height="70" rx="8" fill="#e9f3ef"/><path d="M30 55 L60 18 L90 55 Z" fill="#cfe6dc"/><rect x="44" y="20" width="34" height="40" rx="3" fill="#fff" stroke="#0f6b5c"/><path d="M50 30h22M50 37h22M50 44h16" stroke="#0f6b5c" stroke-width="2"/><path d="M84 18 q12 8 2 26" stroke="#c0392b" stroke-width="3" fill="none"/><circle cx="96" cy="14" r="5" fill="#f4c542"/></svg>',
+ L2:'<svg viewBox="0 0 120 70" width="100%" height="70"><rect width="120" height="70" rx="8" fill="#f6ebe3"/><path d="M0 60 Q60 40 120 60 V70 H0Z" fill="#9cc79b"/><path d="M52 58 V28 l8-12 8 12 V58Z" fill="#b5523b"/><path d="M30 60 V38 l6-8 6 8 V60Z" fill="#c7674d"/><path d="M78 60 V36 l6-9 6 9 V60Z" fill="#c7674d"/><path d="M95 61 V45 l4-6 4 6 V61Z" fill="#c7674d"/><circle cx="20" cy="15" r="7" fill="#f4c542"/></svg>',
+ L3:'<svg viewBox="0 0 120 70" width="100%" height="70"><rect width="120" height="70" rx="8" fill="#e3f0f7"/><path d="M0 50 Q30 44 60 50 T120 50 V70 H0Z" fill="#6fb0d2"/><g fill="#2f7d4f"><circle cx="22" cy="30" r="12"/><circle cx="40" cy="26" r="14"/><circle cx="60" cy="30" r="11"/></g><g stroke="#6b4a2b" stroke-width="2"><path d="M22 40 l-5 14M22 40 l5 14M40 38 l-6 16M40 38 l6 16M60 40 l-4 14M60 40 l4 14"/></g><rect x="88" y="30" width="16" height="12" rx="2" fill="#fff" stroke="#c0392b"/><path d="M88 30 l8 6 8-6" stroke="#c0392b" fill="none"/></svg>',
+ L4:'<svg viewBox="0 0 120 70" width="100%" height="70"><rect width="120" height="70" rx="8" fill="#eef0e4"/><rect x="0" y="40" width="50" height="30" fill="#b9d98a"/><path d="M5 48h40M5 56h40M5 64h40" stroke="#8bb35a"/><rect x="62" y="22" width="14" height="36" fill="#7f8c8d"/><rect x="80" y="14" width="16" height="44" fill="#95a5a6"/><rect x="100" y="28" width="12" height="30" fill="#7f8c8d"/><rect x="0" y="58" width="120" height="6" fill="#555"/><path d="M4 61h10M24 61h10M44 61h10M64 61h10M84 61h10M104 61h10" stroke="#fff"/></svg>',
+ L5:'<svg viewBox="0 0 120 70" width="100%" height="70"><rect width="120" height="70" rx="8" fill="#f3eefa"/><rect x="40" y="26" width="40" height="30" rx="4" fill="#6c4fa3"/><rect x="52" y="20" width="16" height="8" rx="2" fill="none" stroke="#6c4fa3" stroke-width="3"/><rect x="40" y="38" width="40" height="3" fill="#f4c542"/><path d="M14 52 l10-18 10 18Z" fill="#e2c38a"/><path d="M14 52 h20" stroke="#8a6d3b"/><circle cx="98" cy="38" r="10" fill="#fff" stroke="#6c4fa3"/><path d="M93 38 l4 4 7-8" stroke="#1d7a3a" stroke-width="3" fill="none"/></svg>'};
+const ROSTER = {"12A1": [["01", "HS133"], ["02", "HS134"], ["03", "HS56"], ["04", "HS135"], ["05", "HS136"], ["06", "HS137"], ["07", "HS138"], ["08", "HS139"], ["09", "HS140"], ["10", "HS141"], ["11", "HS142"], ["12", "HS143"], ["13", "HS144"], ["14", "HS145"], ["15", "HS146"], ["16", "HS147"], ["17", "HS148"], ["18", "HS149"], ["19", "HS150"], ["20", "HS151"], ["21", "HS152"], ["22", "HS153"], ["23", "HS154"], ["24", "HS155"], ["25", "HS156"], ["26", "HS157"], ["27", "HS158"], ["28", "HS159"], ["29", "HS160"], ["30", "HS161"], ["31", "HS162"], ["32", "HS163"], ["33", "HS164"], ["34", "HS165"], ["35", "HS166"], ["36", "HS167"], ["37", "HS168"], ["38", "HS169"], ["39", "HS170"], ["40", "HS171"], ["41", "HS172"], ["42", "HS173"]], "12A7": [["01", "HS42"], ["02", "HS43"], ["03", "HS44"], ["04", "HS45"], ["05", "HS46"], ["06", "HS47"], ["07", "HS48"], ["08", "HS49"], ["09", "HS50"], ["10", "HS51"], ["11", "HS52"], ["12", "HS53"], ["13", "HS54"], ["14", "HS55"], ["15", "HS56"], ["16", "HS57"], ["17", "HS58"], ["18", "HS59"], ["19", "HS60"], ["20", "HS61"], ["21", "HS62"], ["22", "HS63"], ["23", "HS64"], ["24", "HS65"], ["25", "HS66"], ["26", "HS67"], ["27", "HS68"], ["28", "HS69"], ["29", "HS70"], ["30", "HS71"], ["31", "HS72"], ["32", "HS73"], ["33", "HS74"], ["34", "HS75"], ["35", "HS76"], ["36", "HS77"], ["37", "HS78"], ["38", "HS79"], ["39", "HS80"], ["40", "HS81"], ["41", "HS82"], ["42", "HS83"], ["43", "HS84"], ["44", "HS85"], ["45", "HS86"]]};
+const KEY = "docquemin12_v1";
+let S = load();
+let view = {page: S.user ? "home" : "login", lesson: null, tab: "warm"};
+
+const CAN_SAVE = (()=>{ try{ localStorage.setItem("_t","1"); localStorage.removeItem("_t"); return true; }catch(e){ return false; } })();
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || {user:null, res:{}, writing:{}}; }catch(e){ return {user:null,res:{},writing:{}}; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function esc(t){ return String(t).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function go(p){ if(!S.user && p!=="gv"){ view.page="login"; } else view.page=p; render(); window.scrollTo(0,0); }
+function toggleTV(){ document.body.classList.toggle("tv"); }
+function L(id){ return DATA.lessons.find(x => x.id===id); }
+function rec(lid){ S.res[lid] = S.res[lid] || {}; return S.res[lid]; }
+
+function lessonScore(l){
+  const r = S.res[l.id] || {}; let pts=0, done=0;
+  l.questions.forEach((q,i) => { const a=r[i]; if(a && a.done){ done++; pts += a.tries===1 ? 1 : (a.tries===2 ? 0.5 : 0); } });
+  return {pts, done, total:l.questions.length, ten: Math.round(pts/l.questions.length*100)/10};
+}
+
+function render(){
+  const app = document.getElementById("app");
+  document.getElementById("who").textContent = S.user ? ("Lớp " + S.user.lop + (S.user.stt ? " · STT " + S.user.stt : "") + " · Mã " + S.user.ma) : "";
+  if(view.page==="login") return app.innerHTML = loginView();
+  if(view.page==="home") return app.innerHTML = homeView();
+  if(view.page==="lesson") { app.innerHTML = lessonView(); bindGloss(); return; }
+  if(view.page==="me") return app.innerHTML = meView();
+  if(view.page==="gv") return app.innerHTML = gvView();
+}
+
+function loginView(){
+  const opts = Object.keys(ROSTER).map(c=>`<option>${c}</option>`).join("") + `<option value="khac">Lớp khác</option>`;
+  setTimeout(fillStt, 0);
+  return `<div class="card" style="max-width:520px;margin:20px auto">
+  <h2 style="margin-top:0">Chào em! 👋</h2>
+  <p>Chọn <b>lớp</b> và <b>số thứ tự</b> của em trong danh sách lớp. Máy tự hiện <b>mã học sinh</b>. <b>Không nhập họ tên.</b></p>
+  <p><label>Lớp<br><select id="lop" onchange="fillStt()" style="width:100%">${opts}</select></label></p>
+  <p id="sttBox"></p>
+  <p id="maBox" class="big"></p>
+  <button class="btn" style="width:100%;padding:12px" onclick="login()">Vào học ➜</button>
+  <p class="mute" id="lerr"></p>
+  <details><summary class="mute">Em đã làm trên máy khác? Dán mã kết quả để làm tiếp</summary>
+   <textarea id="paste" placeholder="Dán đoạn bắt đầu bằng DQM12|..." style="min-height:70px"></textarea>
+   <button class="btn ghost" onclick="restoreCode()">Khôi phục</button></details></div>`;
+}
+function fillStt(){
+  const sel = document.getElementById("lop"), box = document.getElementById("sttBox"); if(!sel||!box) return;
+  const c = sel.value;
+  if(c==="khac"){ box.innerHTML = `<label>Mã học sinh thầy phát<br><input id="ma" placeholder="VD HS45" autocapitalize="characters" autocomplete="off" style="width:100%" oninput="showMa()"></label>`; }
+  else box.innerHTML = `<label>Số thứ tự của em<br><select id="stt" onchange="showMa()" style="width:100%"><option value="">– chọn số thứ tự –</option>${ROSTER[c].map(x=>`<option value="${x[0]}">${x[0]}</option>`).join("")}</select></label>`;
+  showMa();
+}
+function pickedUser(){
+  const c = (document.getElementById("lop")||{}).value; if(!c) return null;
+  if(c==="khac"){ const m=((document.getElementById("ma")||{}).value||"").toUpperCase().replace(/\s+/g,""); const ma=/^\d+$/.test(m)?"HS"+m:m; return /^HS\d{1,4}$/.test(ma)?{lop:"Khác",ma}:null; }
+  const st=(document.getElementById("stt")||{}).value; const r=(ROSTER[c]||[]).find(x=>x[0]===st); return r?{lop:c,stt:r[0],ma:r[1]}:null;
+}
+function showMa(){ const u=pickedUser(), b=document.getElementById("maBox"); if(b) b.textContent = u ? "Mã của em: "+u.ma : ""; }
+function login(){
+  const u = pickedUser();
+  if(!u){ const e=document.getElementById("lerr"); if(e) e.textContent = "Em chọn số thứ tự (hoặc nhập mã dạng HS45) rồi bấm Vào học."; return; }
+  S.user = u; save(); go("home");
+}
+function saveWarn(){ return CAN_SAVE ? "" : `<div class="card warn">⚠️ <b>Máy đang mở học liệu ở chế độ không lưu được</b> (thường do mở từ Zalo hoặc thư mục Tải về). Em vẫn làm bài bình thường, nhưng <b>đóng trang là mất</b>. Làm xong mỗi bài, vào <b>📊 Kết quả của em → 📋 Sao chép mã kết quả</b> gửi thầy. Tốt nhất: mở bằng <b>link web thầy gửi</b>.</div>`; }
+function homeView(){
+  let h = saveWarn() + `<div class="card"><b>Cách học:</b> mỗi bài đi 4 bước — <span class="tag">1 Khởi động</span><span class="tag">2 Đọc</span><span class="tag">3 Làm bài</span><span class="tag">4 Viết</span>. Bấm vào <span class="gw">từ gạch chấm</span> để xem nghĩa. Làm sai lần 1 có <b>gợi ý</b>, sai lần 2 máy <b>tô vàng câu chứa đáp án</b> trong bài để em tự tìm lại.</div><div class="grid">`;
+  DATA.lessons.forEach(l => {
+    const s = lessonScore(l);
+    h += `<div class="card lesson" onclick="openLesson('${l.id}')">
+      ${ART[l.id]||""}<span class="tag">${l.unit}</span><span class="tag">${esc(l.unitTitle)}</span>
+      <h3 style="margin:8px 0 4px">${esc(l.title)}</h3>
+      <div class="mute">🏡 ${esc(l.local)}</div>
+      <div class="meter" style="margin-top:10px"><i style="width:${s.done/s.total*100}%"></i></div>
+      <div class="mute">${s.done}/${s.total} câu · điểm ${s.ten}/10</div></div>`;
+  });
+  return h + `</div>`;
+}
+function openLesson(id){ view.page="lesson"; view.lesson=id; view.tab="warm"; render(); window.scrollTo(0,0); }
+function setTab(t){ view.tab=t; render(); }
+
+function textHTML(l){
+  const gl = l.glossary.map(g => g[0]).sort((a,b)=>b.length-a.length);
+  return l.paragraphs.map((p,i) => {
+    let t = esc(p);
+    gl.forEach(w => {
+      const base = w.replace(/ … .*$/,"");
+      const re = new RegExp("\\b(" + base.replace(/[.*+?^${}()|[\]\\]/g,"\\$&") + ")", "i");
+      t = t.replace(re, m => `<span class="gw" data-w="${esc(w)}">${m}</span>`);
+    });
+    return `<p class="para" id="p${i}"><b class="lb">${String.fromCharCode(65+i)}</b>${t}</p>`;
+  }).join("");
+}
+function lessonView(){
+  const l = L(view.lesson), s = lessonScore(l);
+  const tabs = [["warm","1 Khởi động"],["read","2 Đọc"],["task","3 Làm bài ("+s.done+"/"+s.total+")"],["write","4 Viết"]];
+  let h = `<div class="row" style="justify-content:space-between"><div><span class="tag">${l.unit} · ${esc(l.unitTitle)}</span> <span class="tag">${esc(l.grammar)}</span><h2 style="margin:6px 0">${esc(l.title)}</h2></div><div><b>${s.ten}</b>/10</div></div>`;
+  h += `<div class="tabs">` + tabs.map(t => `<button class="${view.tab===t[0]?'on':''}" onclick="setTab('${t[0]}')">${t[1]}</button>`).join("") + `</div>`;
+  if(view.tab==="warm"){
+    h += `<div class="card"><p>🏡 <b>Chủ đề quê mình:</b> ${esc(l.local)}</p><p>💬 <b>Think & share:</b> ${esc(l.warmup)}</p>
+      <p class="mute">Bài này luyện kĩ năng giống bài đọc ${esc(l.sgk)}: <i>${esc(l.skill)}</i>.</p>
+      <h4>Từ khoá cần biết</h4><div class="gl">${l.glossary.map(g=>`<div><b>${esc(g[0])}</b> <span class="mute">${esc(g[1])}</span> – ${esc(g[2])}</div>`).join("")}</div>
+      <p><button class="btn" onclick="setTab('read')">Đọc bài ➜</button></p></div>`;
+  } else if(view.tab==="read"){
+    h += `<div class="card">${textHTML(l)}<p><button class="btn" onclick="setTab('task')">Làm bài ➜</button></p></div>`;
+  } else if(view.tab==="task"){
+    h += `<div class="split"><div class="card text" id="txt">${textHTML(l)}</div><div>` + l.questions.map((q,i)=>qHTML(l,q,i)).join("") +
+      (s.done===s.total?`<div class="card" style="text-align:center;background:var(--ok2)"><div style="font-size:2em">🎉</div><b>Xong bài! Điểm ${s.ten}/10.</b><br><span class="mute">Sang bước 4 Viết, rồi xem 📊 Kết quả để biết kĩ năng cần luyện.</span></div>`:"") + `<button class="btn ghost" onclick="resetLesson('${l.id}')">↺ Làm lại bài này</button></div></div>`;
+  } else {
+    const w = (S.writing[l.id]||"");
+    h += `<div class="card"><p>✍️ ${esc(l.after)}</p><textarea id="wr" oninput="saveW('${l.id}')">${esc(w)}</textarea>
+    <p class="mute" id="wc">${countW(w)} từ · bài viết lưu trên máy này và đi kèm tệp kết quả em nộp cho thầy.</p></div>`;
+  }
+  return h;
+}
+function countW(t){ return (t.trim().match(/\S+/g)||[]).length; }
+function saveW(id){ const el=document.getElementById("wr"); if(!el) return; const v=el.value; S.writing[id]=v; save(); document.getElementById("wc").textContent = countW(v)+" từ · đã lưu."; }
+
+function qHTML(l,q,i){
+  const a = rec(l.id)[i] || {tries:0, picks:[]};
+  let h = `<div class="q" id="q${i}"><div class="mute">${i+1}. ${TYPES[q.type]}</div><div class="qh">${esc(q.q)}</div>`;
+  q.options.forEach((o,k) => {
+    let c = ""; if(a.picks.includes(k)) c = (k===q.answer ? "right" : "wrong");
+    if(a.done && k===q.answer) c = "right";
+    h += `<button class="opt ${c}" ${a.done?"disabled":""} onclick="pick('${l.id}',${i},${k})">${String.fromCharCode(65+k)}. ${esc(o)}</button>`;
+  });
+  if(a.done && a.tries<=2 && a.picks[a.picks.length-1]===q.answer) h += `<div class="fb good"><span class="star">${a.tries===1?"⭐":"✔"}</span> ${a.tries===1?"Chính xác ngay lần đầu!":"Đúng rồi!"} ${esc(q.explain)} ${q.evidence?`<a href="#" onclick="showEv('${l.id}',${i},true);return false">Xem bằng chứng</a>`:""}</div>`;
+  else if(a.done) h += `<div class="fb show">Đáp án: ${String.fromCharCode(65+q.answer)}. ${esc(q.explain)}</div>`;
+  else if(a.tries===1) h += `<div class="fb hint">💡 Gợi ý: ${esc(q.hint)}</div>`;
+  else if(a.tries===2) h += `<div class="fb hint">💡 ${esc(q.hint)}<br>🔎 ${q.evidence?`Câu chứa đáp án đã được <b>tô vàng</b> trong bài – <a href="#" onclick="showEv('${l.id}',${i},false);return false">xem lại</a>. Đọc kĩ rồi chọn lần cuối.`:"Bài <b>không có</b> thông tin này – hãy nghĩ đến Not Given."}</div>`;
+  return h + `</div>`;
+}
+function pick(lid,i,k){
+  const l = L(lid), q = l.questions[i], r = rec(lid);
+  const a = r[i] || {tries:0, picks:[]};
+  if(a.done || a.picks.includes(k)) return;
+  a.tries++; a.picks.push(k);
+  if(k===q.answer){ a.done=true; }
+  else if(a.tries>=3){ a.done=true; }
+  r[i]=a; a.t = Date.now(); save();
+  const keepY = window.scrollY; render(); window.scrollTo(0,keepY);
+  if(k!==q.answer && a.tries===2) showEv(lid,i,false);
+  if(k===q.answer || a.done) showEv(lid,i,true);
+}
+function showEv(lid,i,ok){
+  const q = L(lid).questions[i]; if(!q.evidence) return;
+  const box = document.getElementById("txt"); if(!box) return;
+  box.querySelectorAll("mark").forEach(m => m.replaceWith(...m.childNodes));
+  box.querySelectorAll(".para").forEach(p => {
+    const raw = p.textContent; const pos = raw.indexOf(q.evidence);
+    if(pos<0) return;
+    walkMark(p, q.evidence, ok);
+    p.scrollIntoView({block:"nearest", behavior:"smooth"});
+  });
+}
+function walkMark(p, ev, ok){
+  // tô cụm bằng chứng (cụm có thể vắt qua thẻ từ vựng); thực thể &amp; tính là 1 kí tự
+  const html=p.innerHTML, start=p.textContent.indexOf(ev); if(start<0) return;
+  const end=start+ev.length; let cnt=0, out="", i=0, open=false;
+  while(i<html.length){
+    const ch=html[i];
+    if(ch==="<"){ const j=html.indexOf(">",i); const tag=html.slice(i,j+1);
+      if(open) out+="</mark>"+tag+'<mark class="'+(ok?"ok":"")+'">'; else out+=tag; i=j+1; continue; }
+    if(cnt===start && !open){ out+='<mark class="'+(ok?"ok":"")+'">'; open=true; }
+    if(cnt===end && open){ out+="</mark>"; open=false; }
+    if(ch==="&"){ const j=html.indexOf(";",i); out+=html.slice(i,j+1); i=j+1; } else { out+=ch; i++; }
+    cnt++;
+  }
+  if(open) out+="</mark>";
+  p.innerHTML=out.replace(/<mark class="(ok)?"><\/mark>/g,"");
+  if(!p.querySelector("mark")) p.classList.add("focus");
+}
+function resetLesson(id){ if(confirm("Làm lại bài này từ đầu?")){ S.res[id]={}; save(); render(); } }
+
+function skillStats(res){
+  const st = {}; Object.keys(TYPES).forEach(t => st[t]={n:0,p:0});
+  DATA.lessons.forEach(l => l.questions.forEach((q,i) => { const a=(res[l.id]||{})[i]; if(a&&a.done){ st[q.type].n++; st[q.type].p += a.tries===1?1:(a.tries===2?0.5:0); } }));
+  return st;
+}
+function meView(){
+  if(!S.user) return loginView();
+  const st = skillStats(S.res);
+  let h = `<div class="card"><h2 style="margin-top:0">📊 Bản đồ kĩ năng đọc của em</h2>`;
+  Object.keys(TYPES).forEach(t => { const v = st[t].n ? Math.round(st[t].p/st[t].n*100) : 0;
+    h += `<div class="skill"><div>${TYPES[t]}</div><div class="meter"><i style="width:${v}%"></i></div><div>${st[t].n?v+"%":"–"}</div></div>`; });
+  h += `<p class="mute">Thanh ngắn nhất là kĩ năng em cần luyện thêm. Đúng ngay lần 1 = 1 điểm · lần 2 = ½ · lần 3 = 0.</p></div>`;
+  h += `<div class="card"><h3 style="margin-top:0">Điểm từng bài</h3><table><tr><th>Bài</th><th>Đã làm</th><th>Điểm /10</th></tr>` +
+    DATA.lessons.map(l => { const s=lessonScore(l); return `<tr><td class="l">${l.unit} – ${esc(l.title)}</td><td>${s.done}/${s.total}</td><td>${s.ten}</td></tr>`; }).join("") + `</table></div>`;
+  h += `<div class="card"><h3 style="margin-top:0">Nộp kết quả cho thầy</h3><p><b>Trên điện thoại:</b> bấm <b>📋 Sao chép mã kết quả</b> rồi dán vào tin nhắn Zalo gửi thầy. <b>Trên máy tính:</b> có thể bấm <b>Tải tệp kết quả</b>. Mã và tệp chỉ có lớp, số thứ tự, mã của em.</p>
+    <div class="row"><button class="btn" onclick="copyCode()">📋 Sao chép mã kết quả</button><button class="btn ghost" onclick="exportMe()">⬇ Tải tệp kết quả</button>
+    <label class="btn ghost">⬆ Khôi phục từ tệp<input type="file" accept=".json" hidden onchange="restoreMe(this)"></label>
+    <button class="btn ghost" onclick="logout()">Đổi mã / máy dùng chung</button></div><div id="codeBox"></div></div>`;
+  return h;
+}
+function resCode(){
+  const parts = DATA.lessons.map(l => l.questions.map((q,i)=>{ const a=(S.res[l.id]||{})[i]; return a&&a.done ? String(Math.min(a.tries,3)) : "0"; }).join(""));
+  const words = DATA.lessons.map(l => countW(S.writing[l.id]||"")).join(".");
+  return ["DQM12", S.user.lop, S.user.stt||"", S.user.ma, parts.join("-"), words].join("|");
+}
+function parseCode(t){
+  const out=[]; (t.match(/DQM12\|[^\s]+/g)||[]).forEach(c=>{ const f=c.split("|"); if(f.length<6) return;
+    const parts=f[4].split("-"), res={}, writing={};
+    DATA.lessons.forEach((l,li)=>{ const p=parts[li]||""; res[l.id]={}; [...p].forEach((d,i)=>{ const n=+d; if(n>0) res[l.id][i]={tries:n,done:true,picks:[]}; }); });
+    const w=(f[5]||"").split("."); DATA.lessons.forEach((l,li)=>{ const n=+w[li]||0; if(n) writing[l.id]=Array(n).fill("x").join(" "); });
+    out.push({app:"DocQueMinh12",lop:f[1],stt:f[2],ma:f[3],res,writing}); });
+  return out;
+}
+function copyCode(){
+  const t=resCode(), box=document.getElementById("codeBox"); if(!box) return;
+  box.innerHTML=`<textarea id="codeTxt" readonly style="min-height:70px;font-size:14px" onclick="this.select()">${esc(t)}</textarea>`;
+  const ok=()=>box.insertAdjacentHTML("beforeend",`<p class="fb good">✔ Đã sao chép. Em mở Zalo, dán vào tin nhắn gửi thầy.</p>`);
+  const fail=()=>box.insertAdjacentHTML("beforeend",`<p class="fb hint">Máy không tự sao chép được: em chạm vào ô mã ở trên (máy tự bôi đen) → giữ ngón tay → Sao chép.</p>`);
+  const ta=document.getElementById("codeTxt"); ta.focus(); ta.select(); try{ ta.setSelectionRange(0, t.length); }catch(e){}
+  let done=false; try{ done=document.execCommand("copy"); }catch(e){}
+  if(done) return ok();
+  try{ navigator.clipboard.writeText(t).then(ok,fail); }catch(e){ fail(); }
+}
+function restoreCode(){
+  const d=parseCode((document.getElementById("paste")||{}).value||"")[0];
+  if(!d){ alert("Mã không đúng. Mã bắt đầu bằng DQM12|"); return; }
+  S={user:{lop:d.lop,stt:d.stt,ma:d.ma},res:d.res,writing:{}}; save(); go("me");
+}
+function payload(){ return {app:"DocQueMinh12", v:1, lop:S.user.lop, stt:S.user.stt||"", ma:S.user.ma, at:new Date().toISOString(), res:S.res, writing:S.writing}; }
+function dl(name, text, type){ const b=new Blob([text],{type}); const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500); }
+function exportMe(){ try{ dl(`ketqua_${S.user.lop}_${S.user.ma}.json`, JSON.stringify(payload()), "application/json"); }catch(e){} copyCode(); }
+function restoreMe(inp){ const f=inp.files[0]; if(!f) return; f.text().then(t=>{ try{ const d=JSON.parse(t); if(d.app!=="DocQueMinh12") throw 0; S={user:{lop:d.lop,stt:d.stt,ma:d.ma},res:d.res||{},writing:d.writing||{}}; save(); go("me"); }catch(e){ alert("Tệp không đúng."); } }); }
+function logout(){ if(confirm("Máy dùng chung: em đã tải tệp kết quả chưa? Bấm OK để xoá dữ liệu của em khỏi máy này.")){ S={user:null,res:{},writing:{}}; save(); go("login"); } }
+
+/* ===== GIÁO VIÊN: gộp tệp kết quả của lớp, không cần mạng ===== */
+let G = [];
+function gvView(){
+  let h = `<div class="card"><h2 style="margin-top:0">🧑‍🏫 Tổng hợp kết quả lớp</h2>
+   <p>Chọn cùng lúc nhiều tệp <code>ketqua_*.json</code> học sinh nộp. Máy chỉ đọc trên trình duyệt này, không gửi đi đâu.</p>
+   <div class="row"><label class="btn">📂 Chọn các tệp kết quả<input type="file" accept=".json" multiple hidden onchange="gvLoad(this)"></label>
+   ${G.length?`<button class="btn ghost" onclick="gvCSV()">⬇ Xuất bảng CSV (mở bằng Excel)</button><button class="btn ghost" onclick="G=[];render()">Xoá</button>`:""}</div>
+   <p style="margin-bottom:4px"><b>Hoặc dán mã kết quả</b> học sinh gửi qua Zalo (dán cả đoạn chat cũng được):</p>
+   <textarea id="gvPaste" placeholder="DQM12|12A7|05|HS46|..." style="min-height:80px"></textarea>
+   <button class="btn ghost" onclick="gvPasteRead()">Đọc mã đã dán</button>
+   <p class="mute">Đã nạp: ${G.length} học sinh.</p></div>`;
+  if(!G.length) return h;
+  const st = {}; Object.keys(TYPES).forEach(t => st[t]={n:0,p:0});
+  G.forEach(g => { const s=skillStats(g.res); Object.keys(st).forEach(t=>{ st[t].n+=s[t].n; st[t].p+=s[t].p; }); });
+  h += `<div class="card"><h3 style="margin-top:0">Bản đồ kĩ năng của lớp</h3>` + Object.keys(TYPES).map(t => { const v=st[t].n?Math.round(st[t].p/st[t].n*100):0;
+    return `<div class="skill"><div>${TYPES[t]}</div><div class="meter"><i style="width:${v}%"></i></div><div>${st[t].n?v+"%":"–"}</div></div>`; }).join("") + `</div>`;
+  h += `<div class="card"><h3 style="margin-top:0">Từng học sinh (điểm /10 mỗi bài)</h3><div style="overflow:auto"><table><tr><th>Lớp</th><th>STT</th><th>Mã</th>` + DATA.lessons.map(l=>`<th>${l.unit}</th>`).join("") + `<th>Số chữ bài viết</th></tr>` +
+    G.map(g => `<tr><td>${esc(g.lop)}</td><td>${esc(g.stt||"")}</td><td>${esc(g.ma)}</td>` + DATA.lessons.map(l => { const s=scoreOf(g,l); return `<td class="${s.done&&s.ten<5?'low':''}">${s.done?s.ten:"–"}</td>`; }).join("") + `<td>${Object.values(g.writing||{}).reduce((a,w)=>a+countW(w),0)}</td></tr>`).join("") + `</table></div></div>`;
+  h += `<div class="card"><h3 style="margin-top:0">Câu lớp sai nhiều (tỉ lệ đúng ngay lần 1)</h3><div style="overflow:auto"><table><tr><th>Bài</th><th>Câu</th><th>Dạng</th><th>Số HS làm</th><th>Đúng lần 1</th></tr>`;
+  const rows=[];
+  DATA.lessons.forEach(l => l.questions.forEach((q,i) => { let n=0,f=0; G.forEach(g=>{ const a=((g.res||{})[l.id]||{})[i]; if(a&&a.done){n++; if(a.tries===1) f++;} }); if(n) rows.push([l.unit,i+1,TYPES[q.type],n,Math.round(f/n*100)]); }));
+  rows.sort((a,b)=>a[4]-b[4]).forEach(r => h += `<tr class="${r[4]<50?'low':''}"><td>${r[0]}</td><td>${r[1]}</td><td class="l">${r[2]}</td><td>${r[3]}</td><td>${r[4]}%</td></tr>`);
+  return h + `</table></div></div>`;
+}
+function scoreOf(g,l){ const r=(g.res||{})[l.id]||{}; let pts=0,done=0; l.questions.forEach((q,i)=>{const a=r[i]; if(a&&a.done){done++; pts+=a.tries===1?1:(a.tries===2?0.5:0);} }); return {done, ten:Math.round(pts/l.questions.length*100)/10}; }
+function gvAdd(arr){ arr.filter(Boolean).forEach(d => { G = G.filter(g => !(g.lop===d.lop && g.ma===d.ma)); G.push(d); });
+  G.sort((a,b)=>(a.lop+a.ma).localeCompare(b.lop+b.ma,undefined,{numeric:true})); render(); }
+function gvPasteRead(){ const a=parseCode((document.getElementById("gvPaste")||{}).value||""); if(!a.length){ alert("Không thấy mã nào bắt đầu bằng DQM12|"); return; } gvAdd(a); }
+function gvLoad(inp){
+  const fs=[...inp.files]; Promise.all(fs.map(f=>f.text().then(t=>{ try{ const d=JSON.parse(t); return d.app==="DocQueMinh12"?d:null; }catch(e){ return null; } }))).then(arr=>{
+    arr.filter(Boolean).forEach(d => { G = G.filter(g => !(g.lop===d.lop && g.ma===d.ma)); G.push(d); });
+    G.sort((a,b)=>(a.lop+a.ma).localeCompare(b.lop+b.ma,undefined,{numeric:true})); render(); });
+}
+function gvCSV(){
+  const head = ["Lop","STT","Ma"].concat(DATA.lessons.map(l=>l.unit.replace(" ","")+"_diem10")).concat(Object.keys(TYPES).map(t=>"KN_"+t+"_%")).concat(["So_chu_viet"]);
+  const lines=[head.join(",")];
+  G.forEach(g => { const s=skillStats(g.res||{});
+    lines.push([g.lop,g.stt||"",g.ma].concat(DATA.lessons.map(l=>{const x=scoreOf(g,l); return x.done?x.ten:"";})).concat(Object.keys(TYPES).map(t=>s[t].n?Math.round(s[t].p/s[t].n*100):"")).concat([Object.values(g.writing||{}).reduce((a,w)=>a+countW(w),0)]).join(",")); });
+  dl("tong-hop-doc-que-minh-12.csv","﻿"+lines.join("\n"),"text/csv");
+}
+
+/* ===== tra nghĩa ===== */
+function bindGloss(){
+  const tip=document.getElementById("tip"); const l=L(view.lesson);
+  document.querySelectorAll(".gw").forEach(el => {
+    el.onclick = ev => { const g=l.glossary.find(x=>x[0]===el.dataset.w); if(!g) return;
+      tip.innerHTML=`<b>${esc(g[0])}</b> ${esc(g[1])}<br>${esc(g[2])}`; tip.style.display="block";
+      tip.style.left=Math.min(ev.clientX, innerWidth-270)+"px"; tip.style.top=(ev.clientY+14)+"px"; ev.stopPropagation(); };
+  });
+}
+document.addEventListener("click", () => { document.getElementById("tip").style.display="none"; });
+render();
+</script>
+
+<script>
+/* Bản cài lên điện thoại: lưu toàn bộ học liệu vào máy để mở lại KHÔNG CẦN MẠNG */
+(function(){
+  if(!("serviceWorker" in navigator) || !/^https?:/.test(location.protocol)) return;
+  navigator.serviceWorker.register("sw.js").then(function(){
+    var ok = function(){ var b=document.getElementById("offBadge"); if(b) b.textContent="✅ Đã lưu vào máy – mở lại không cần mạng"; };
+    if(navigator.serviceWorker.controller) ok(); else navigator.serviceWorker.addEventListener("controllerchange", ok);
+  }).catch(function(){});
+  var standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+  if(standalone) return;
+  var ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  var bar = document.createElement("div");
+  bar.style.cssText = "background:#fff3dc;color:#7a4a00;padding:8px 14px;font-size:.9em;text-align:center;border-bottom:1px solid #e0c48a";
+  bar.innerHTML = '<span id="offBadge">⏳ Đang lưu học liệu vào máy…</span><br>📲 <b>Cài lên điện thoại để dùng không cần mạng:</b> ' +
+    (ios ? 'bấm nút <b>Chia sẻ ⬆️</b> của Safari → <b>Thêm vào MH chính</b>.' : 'bấm <b>⋮</b> của Chrome → <b>Cài đặt ứng dụng</b> / <b>Thêm vào màn hình chính</b>.') +
+    ' Sau đó mở bằng biểu tượng <b>Đọc Quê Mình</b>.';
+  var hdr = document.querySelector("header"); if(hdr) hdr.parentNode.insertBefore(bar, hdr.nextSibling);
+})();
+</script>
+</body>
+</html>

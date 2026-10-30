@@ -1,0 +1,25 @@
+{
+ "name": "Đọc Quê Mình 12",
+ "short_name": "Đọc Quê Mình",
+ "description": "Học liệu đọc hiểu Tiếng Anh 12 tích hợp ngữ liệu địa phương Tuy Phước – chạy không cần mạng",
+ "start_url": "./index.html",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#f6f4ee",
+ "theme_color": "#0f6b5c",
+ "lang": "vi",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any maskable"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any maskable"
+  }
+ ]
+}
